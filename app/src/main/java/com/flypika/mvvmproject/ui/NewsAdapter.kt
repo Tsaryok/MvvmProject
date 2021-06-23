@@ -30,14 +30,14 @@ class NewsAdapter: ListAdapter<News, NewsAdapter.NewsViewHolder>(NewsDiffCallbac
 
     class NewsViewHolder(private val mBinding: NewsItemBinding):
         RecyclerView.ViewHolder(mBinding.root){
-        private var isMarked = false
+        lateinit var currentNews: News
         init {
             mBinding.root.setOnClickListener {
                 Log.i(TAG, "Click on item")
-                isMarked = if (isMarked) {
+                currentNews.isMarked = if (currentNews.isMarked) {
                     mBinding.root.setCardBackgroundColor(Color.WHITE)
                     false
-                }else {
+                }else{
                     mBinding.root.setCardBackgroundColor(Color.GREEN)
                     true
                 }
@@ -46,6 +46,12 @@ class NewsAdapter: ListAdapter<News, NewsAdapter.NewsViewHolder>(NewsDiffCallbac
 
         @SuppressLint("SetTextI18n")
         fun bind(news: News){
+            currentNews = news
+            if (currentNews.isMarked) {
+                mBinding.root.setCardBackgroundColor(Color.GREEN)
+            }else{
+                mBinding.root.setCardBackgroundColor(Color.WHITE)
+            }
             mBinding.title.text = news.title
             mBinding.author.text = news.author
         }
