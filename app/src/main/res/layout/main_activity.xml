@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--обычно activity/fragment/item идет префиксом,-->
+<!--чтобы была естественная сортировка файлов по типу-->
+<!--то бишь этот файл должен быть activity_main-->
 <androidx.fragment.app.FragmentContainerView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
