@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--обычно activity/fragment/item идет префиксом,-->
+<!--чтобы была естественная сортировка файлов по типу-->
+<!--то бишь этот файл должен быть item_news-->
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -9,6 +12,8 @@
     app:cardUseCompatPadding="true"
     app:cardBackgroundColor="@color/white">
 
+<!--    ого какая древность :)-->
+<!--    переходи на ConstraintLayout-->
     <RelativeLayout
         android:id="@+id/layout"
         android:layout_width="match_parent"

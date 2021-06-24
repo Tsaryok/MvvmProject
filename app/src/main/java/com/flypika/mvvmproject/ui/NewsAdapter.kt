@@ -10,8 +10,11 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.flypika.mvvmproject.databinding.NewsItemBinding
 import com.flypika.mvvmproject.model.News
+
+// Ctrl + Alt + L
 
 class NewsAdapter: ListAdapter<News, NewsAdapter.NewsViewHolder>(NewsDiffCallback) {
 
@@ -28,10 +31,16 @@ class NewsAdapter: ListAdapter<News, NewsAdapter.NewsViewHolder>(NewsDiffCallbac
         holder.bind(getItem(position))
     }
 
+    // мы не юзаем m как префикс для приватных полей
+    // в котлине уж точно
     class NewsViewHolder(private val mBinding: NewsItemBinding):
         RecyclerView.ViewHolder(mBinding.root){
         lateinit var currentNews: News
         init {
+            // логика на вью слое, вьюмодель даже не узнает, что был клик на айтем
+            // на самом деле это мое задание говно, нужно было придумать что-то,
+            // чтобы по клику еще и вьюмодель что-то делала, но ладно)
+            // сделай так, чтобы обновление состояния списка происходило во вьюмодели
             mBinding.root.setOnClickListener {
                 Log.i(TAG, "Click on item")
                 currentNews.isMarked = if (currentNews.isMarked) {
@@ -54,19 +63,29 @@ class NewsAdapter: ListAdapter<News, NewsAdapter.NewsViewHolder>(NewsDiffCallbac
             }
             mBinding.title.text = news.title
             mBinding.author.text = news.author
+            // я подгрузил фотку новости и верстка чутка поехала
+            // сделай, чтобы нормально было
+            Glide.with(mBinding.image)
+                .load(news.urlToImage)
+                .into(mBinding.image)
         }
     }
 
     object NewsDiffCallback: DiffUtil.ItemCallback<News>() {
         override fun areItemsTheSame(oldItem: News, newItem: News): Boolean {
+            // неверно, в этом колбэке сравнивают айдишки айтемов
+            // если их нет, то наверное лучше отказаться от DiffUtil
             return oldItem == newItem
         }
 
         override fun areContentsTheSame(oldItem: News, newItem: News): Boolean {
+            // а вот здесь как раз удобно использовать equals (==)
+            // разумеется при условии что News станет data классом
             return oldItem.author == newItem.author
                     && oldItem.description == newItem.description
                     && oldItem.title == newItem.title
                     && oldItem.urlToImage == newItem.urlToImage
         }
     }
+    // почитай доку DiffUtil.ItemCallback, зачем именно нужен каждый колбэк
 }

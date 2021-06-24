@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.flypika.mvvmproject.DataRepository
 import com.flypika.mvvmproject.model.News
 import kotlinx.coroutines.launch
-
+//Ctrl + Alt + L
 class NewsListViewModel : ViewModel() {
 
     private val repository = DataRepository.getInstance()
@@ -16,7 +16,7 @@ class NewsListViewModel : ViewModel() {
 
     init {
         repository.getNewsList { news_list ->
-            viewModelScope.launch {
+            viewModelScope.launch { // зачем?
                 if (news_list != null) {
                     _news.value = news_list
                 }

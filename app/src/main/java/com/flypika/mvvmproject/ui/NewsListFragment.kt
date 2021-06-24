@@ -12,9 +12,12 @@ import com.flypika.mvvmproject.viewmodel.NewsListViewModel
 import com.flypika.mvvmproject.databinding.NewsListFragmentBinding
 import com.flypika.mvvmproject.model.News
 
+// Ctrl + Alt + L
+
 class NewsListFragment : Fragment(){
 
     private val viewModel: NewsListViewModel by viewModels()
+    // ааа биндинги
     private lateinit var mBinding: NewsListFragmentBinding
     private lateinit var mNewsAdapter: NewsAdapter
 
@@ -38,6 +41,9 @@ class NewsListFragment : Fragment(){
 
     private fun subscribeUi(liveData: LiveData<List<News>>){
         liveData.observe(viewLifecycleOwner){
+            // здесь еще желательно на null проверять
+            // но submitList принимает nullable аргумент
+            // так что конкретно тут нормально
             mNewsAdapter.submitList(it)
         }
     }
