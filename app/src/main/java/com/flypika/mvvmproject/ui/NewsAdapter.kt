@@ -2,71 +2,68 @@ package com.flypika.mvvmproject.ui
 
 import android.annotation.SuppressLint
 import android.graphics.Color
-import android.graphics.drawable.Drawable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.flypika.mvvmproject.databinding.NewsItemBinding
+import com.bumptech.glide.Glide
+import com.flypika.mvvmproject.databinding.ItemNewsBinding
 import com.flypika.mvvmproject.model.News
 
-class NewsAdapter: ListAdapter<News, NewsAdapter.NewsViewHolder>(NewsDiffCallback) {
+class NewsAdapter(private val callback: NewsClickCallback?) : ListAdapter<News, NewsAdapter.NewsViewHolder>(NewsDiffCallback) {
 
-    companion object{
+    companion object {
         const val TAG = "NewsAdapter"
     }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsViewHolder {
-        val mBinding = NewsItemBinding
-            .inflate(LayoutInflater.from(parent.context), parent, false)
-        return NewsViewHolder(mBinding)
+        val binding = ItemNewsBinding
+                .inflate(LayoutInflater.from(parent.context), parent, false)
+        return NewsViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: NewsViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(position)
     }
 
-    class NewsViewHolder(private val mBinding: NewsItemBinding):
-        RecyclerView.ViewHolder(mBinding.root){
-        lateinit var currentNews: News
+    inner class NewsViewHolder(private val binding: ItemNewsBinding) :
+            RecyclerView.ViewHolder(binding.root) {
+        private var currentPosition = 0
+
         init {
-            mBinding.root.setOnClickListener {
+            binding.root.setOnClickListener {
                 Log.i(TAG, "Click on item")
-                currentNews.isMarked = if (currentNews.isMarked) {
-                    mBinding.root.setCardBackgroundColor(Color.WHITE)
-                    false
-                }else{
-                    mBinding.root.setCardBackgroundColor(Color.GREEN)
-                    true
-                }
+                callback?.onClick(currentPosition)
             }
         }
 
         @SuppressLint("SetTextI18n")
-        fun bind(news: News){
-            currentNews = news
-            if (currentNews.isMarked) {
-                mBinding.root.setCardBackgroundColor(Color.GREEN)
-            }else{
-                mBinding.root.setCardBackgroundColor(Color.WHITE)
+        fun bind(_position: Int) {
+            Log.i(TAG, "Bind")
+            currentPosition = _position
+            if (getItem(currentPosition).isMarked) {
+                binding.root.setCardBackgroundColor(Color.GREEN)
+            } else {
+                binding.root.setCardBackgroundColor(Color.WHITE)
             }
-            mBinding.title.text = news.title
-            mBinding.author.text = news.author
+            binding.title.text = getItem(currentPosition).title
+            binding.author.text = getItem(currentPosition).author
+            Glide.with(binding.image)
+                    .load(getItem(currentPosition).urlToImage)
+                    .into(binding.image)
         }
     }
 
-    object NewsDiffCallback: DiffUtil.ItemCallback<News>() {
+    object NewsDiffCallback : DiffUtil.ItemCallback<News>() {
         override fun areItemsTheSame(oldItem: News, newItem: News): Boolean {
-            return oldItem == newItem
+            return oldItem.title == newItem.title
         }
 
         override fun areContentsTheSame(oldItem: News, newItem: News): Boolean {
-            return oldItem.author == newItem.author
-                    && oldItem.description == newItem.description
-                    && oldItem.title == newItem.title
-                    && oldItem.urlToImage == newItem.urlToImage
+            Log.i(TAG, "areContentsTheSame")
+            return oldItem.isMarked == newItem.isMarked
         }
     }
 }

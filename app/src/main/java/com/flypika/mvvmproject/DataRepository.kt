@@ -13,15 +13,14 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class DataRepository {
 
-    companion object{
-
+    companion object {
         private const val TAG = "DataRepository"
         private var instance: DataRepository? = null
 
-        fun getInstance(): DataRepository{
+        fun getInstance(): DataRepository {
             if (instance == null) {
-                synchronized(this){
-                    if (instance == null){
+                synchronized(this) {
+                    if (instance == null) {
                         instance = DataRepository()
                     }
                 }
@@ -31,34 +30,33 @@ class DataRepository {
     }
 
     private val service: WebService
+
     init {
-        val interceptor = HttpLoggingInterceptor();
-        interceptor.apply { interceptor.level = HttpLoggingInterceptor.Level.BODY };
-        val client = OkHttpClient.Builder().addInterceptor(interceptor).build();
+        val interceptor = HttpLoggingInterceptor()
+        interceptor.apply { interceptor.level = HttpLoggingInterceptor.Level.BODY }
+        val client = OkHttpClient.Builder().addInterceptor(interceptor).build()
         service = Retrofit.Builder()
                 .baseUrl("https://newsapi.org/v2/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
-                .build().create(WebService::class.java)
+                .build()
+                .create(WebService::class.java)
     }
 
-
-
-    fun getNewsList(callback: (List<News>?) -> Unit){
+    fun getNewsList(callback: (ArrayList<News>?) -> Unit) {
         service.getTopHeadlines().enqueue(object : Callback<ResponseNews> {
             override fun onResponse(call: Call<ResponseNews>, response: Response<ResponseNews>) {
-                if (response.isSuccessful){
+                if (response.isSuccessful) {
                     Log.i(TAG, "Response is received: ${response.body()?.totalResults} news, status - ${response.body()?.status}, code - ${response.code()}")
-                    if (response.body()!!.status == "ok")
+                    if (response.body()!!.status == "ok") {
                         callback(response.body()?.articles)
+                    }
                 }
             }
 
             override fun onFailure(call: Call<ResponseNews>, t: Throwable) {
                 Log.w(TAG, "Request is failed: ${t.localizedMessage}")
             }
-
         })
     }
-
 }
