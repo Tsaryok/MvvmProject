@@ -58,17 +58,23 @@ class NewsListViewModelTest {
         viewModel.updateNews()
         verify(repository).getNewsList()
         assertEquals(viewModel.news.value, list)
-        //verify(observer).onChanged(list)
+        //verify(observer).onChanged(list) зачем закомментил?
+        // добавь еще verifyNoMoreInteractions для моков, чтобы была уверенность, что больше
+        // никаких дейсвтий не происходит
     }
 
     @Test
     fun changeMark() {
         viewModel.updateNews()
-        verify(repository).getNewsList()
-        assertEquals(viewModel.news.value, list)
+        verify(repository).getNewsList() // этот момент ты тестишь в предыдущем тесте. Думаю нет смысла здесь это друблировать
+        assertEquals(viewModel.news.value, list) // аналогично
         val prevList = viewModel.news.value
         assertNotNull(prevList)
         viewModel.changeMark(1)
+        // более наглядно было бы составить список, который мы ожидаем получить
+        // после совершения каких либо действий.
+        // Так заодно сможешь потестить приход нового списка в observer
+        // как в предыдущем тесте, хотя в нем ты это зачем то закомментил
         prevList!!.forEachIndexed { index, value ->
             if (viewModel.news.value!![index] != value) {
                 assertEquals(index, 1)
