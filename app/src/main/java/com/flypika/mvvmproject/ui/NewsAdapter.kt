@@ -63,7 +63,7 @@ class NewsAdapter(private val callback: NewsClickCallback?) : ListAdapter<News, 
 
         override fun areContentsTheSame(oldItem: News, newItem: News): Boolean {
             Log.i(TAG, "areContentsTheSame")
-            return oldItem.isMarked == newItem.isMarked
+            return oldItem == newItem
         }
     }
 }
