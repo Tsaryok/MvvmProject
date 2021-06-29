@@ -19,8 +19,7 @@ import org.mockito.kotlin.mock
 @RunWith(JUnit4::class)
 class NewsListViewModelTest {
 
-    @Rule
-    @JvmField
+    @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
 
     val io = Schedulers.trampoline()
@@ -31,6 +30,8 @@ class NewsListViewModelTest {
     lateinit var repository: DataRepository
 
     lateinit var viewModel: NewsListViewModel
+
+    lateinit var observer: Observer<List<News>>
 
     @Before
     fun setUp() {
@@ -45,6 +46,8 @@ class NewsListViewModelTest {
             } doReturn Observable.just(ResponseNews("ok", 3, list))
         }
         viewModel = NewsListViewModel(repository, io, ui)
+        observer = mock()
+        viewModel.news.observeForever(observer)
     }
 
     @After
@@ -53,29 +56,23 @@ class NewsListViewModelTest {
 
     @Test
     fun updateNews() {
-        val observer = mock<Observer<List<News>>>()
-        viewModel.news.observeForever(observer)
         viewModel.updateNews()
         verify(repository).getNewsList()
         assertEquals(viewModel.news.value, list)
-        //verify(observer).onChanged(list)
+        verify(observer).onChanged(list)
+        verifyNoMoreInteractions(observer)
     }
 
     @Test
     fun changeMark() {
         viewModel.updateNews()
         verify(repository).getNewsList()
-        assertEquals(viewModel.news.value, list)
-        val prevList = viewModel.news.value
-        assertNotNull(prevList)
         viewModel.changeMark(1)
-        prevList!!.forEachIndexed { index, value ->
-            if (viewModel.news.value!![index] != value) {
-                assertEquals(index, 1)
-                assertNotEquals(value.isMarked, viewModel.news.value!![index].isMarked)
-            } else {
-                assertNotEquals(index, 1)
-            }
-        }
+        val actual = listOf(
+            News("BBC", "Title1", "News1", "https:..."),
+            News("The Times", "Title2", "News2", "https:...", true),
+            News("The Daily Telegraph", "Title3", "News3", "https:...")
+        )
+        verify(observer).onChanged(actual)
     }
 }
